@@ -18,10 +18,7 @@ int countHerDiabetes(Node *root){
     if(!root) return 0;
     int count = 0;
 
-    if (root->left && (root->diag == "sim" && root->left->diag == "sim"))
-        count++;
-
-    if (root->right && (root->diag == "sim" && root->right->diag == "sim"))
+    if (root->diag == "sim" && (root->left || root->right) && (root->left->diag == "sim" || root->right->diag == "sim"))
         count++;
 
     count += countHerDiabetes(root->left);
