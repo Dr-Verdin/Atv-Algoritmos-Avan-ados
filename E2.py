@@ -1,4 +1,4 @@
-import math
+from datetime import datetime 
 
 # Número de casos testes
 n_testes = int(input())
@@ -28,4 +28,4 @@ for _ in range(n_testes):
             break
     
     # Saída
-    print(f"{len(datas_soma_maiores)} dias ({', '.join(sorted(datas_soma_maiores))}) | soma={soma_maiores:.2f} | {(len(datas_soma_maiores)*100)/len(dados):.2f}% dos dias totais")
+    print(f"{len(datas_soma_maiores)} dias ({', '.join(sorted(datas_soma_maiores, key=lambda x: datetime.strptime(x, "%d/%m/%Y")))}) | soma={soma_maiores:.2f} | {(len(datas_soma_maiores)*100)/len(dados):.2f}% dos dias totais")
