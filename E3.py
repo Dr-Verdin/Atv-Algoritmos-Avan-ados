@@ -13,16 +13,17 @@ for _ in range(n_testes):
     n_alugueis = int(input())
 
     dados = []
-    for _ in range(n_alugueis):
-        line = input().split()
+    for __ in range(n_alugueis):
+        line = input()
+        line = line.split()
         id = int(line[0])
         h_inicio = h_para_min(line[1])
         h_fim = h_para_min(line[2])
         modelo = int(line[3])
         dados.append([id, h_inicio, h_fim, modelo])
-    
+
     # Agrupar os alugueis por modelo
-    dados_modelo = defaultdict(list)
+    dados_modelo = {modelo+1:[] for modelo in range(n_modelos)}
     for d in dados:
         dados_modelo[d[3]].append(d)
 
@@ -39,7 +40,10 @@ for _ in range(n_testes):
             if a[1] >= fim_ultimo_aluguel:
                 escolhidos.append(a[0])
                 fim_ultimo_aluguel = a[2]
-        
-        saidas.append(f"{modelo}: {len(escolhidos)} = {', '.join(map(str, escolhidos))}")   # saída de cada modelo
+        if len(escolhidos)>0:
+            txt_out = f"{modelo}: {len(escolhidos)} = {', '.join(map(str, escolhidos))}"
+        else:
+            txt_out = f"{modelo}: 0"
+        saidas.append(txt_out)   # saída de cada modelo
     
     print(" | ".join(saidas))   # saida completa do teste
