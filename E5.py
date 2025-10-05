@@ -1,7 +1,18 @@
-# FUnção para calcular o número de ultrapassagens
+# Função para calcular o número de ultrapassagens (qunado a ordem relativa dos jogadores muda)
 def calc_ultrapassagens(local_jogadores):
-    #  desenvolver ...
-    return total_ultrapassagens
+    ultrapassagens = 0
+    n  = len(local_jogadores)
+
+    for i in range(n):
+        for j in range(i+1, n):
+            pos_inicial_i, pos_final_i = local_jogadores[i]
+            pos_inicial_j, pos_final_j = local_jogadores[j]
+
+            # Verifica se houve ultrapassagem
+            if pos_inicial_i > pos_inicial_j  and  pos_final_i < pos_final_j:
+                ultrapassagens += 1
+
+    return ultrapassagens
 
 # Número de trechos
 n_trechos = int(input())
