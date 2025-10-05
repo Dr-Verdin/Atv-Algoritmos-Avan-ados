@@ -9,7 +9,8 @@ def calc_ultrapassagens(local_jogadores):
             pos_inicial_j, pos_final_j = local_jogadores[j]
 
             # Verifica se houve ultrapassagem
-            if pos_inicial_i > pos_inicial_j  and  pos_final_i < pos_final_j:
+            if (pos_inicial_i > pos_inicial_j  and  pos_final_i < pos_final_j) \
+            or (pos_inicial_i < pos_inicial_j  and  pos_final_i > pos_final_j):
                 ultrapassagens += 1
 
     return ultrapassagens
@@ -25,7 +26,7 @@ for trecho in range(n_trechos):
 
     # Posição dos jogadores
     for _ in range(n_jogadores_trecho):
-        inicio, final = input().split()
+        inicio, final = map(int, input().split())
         local_jogadores.append([inicio, final])
 
     # Calculo do número de ultrapassagens
