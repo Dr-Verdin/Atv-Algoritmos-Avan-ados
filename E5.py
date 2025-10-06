@@ -1,19 +1,44 @@
 # Função para calcular o número de ultrapassagens (qunado a ordem relativa dos jogadores muda)
+def merge_count(arr):
+    if len(arr) <= 1:
+        return arr, 0
+
+    meio = len(arr) // 2
+    esquerda, inv_esq = merge_count(arr[:meio])
+    direita, inv_dir = merge_count(arr[meio:])
+
+    merged = []
+    i = j = 0
+    inversoes = inv_esq + inv_dir
+
+    # Merge das duas metades
+    while i < len(esquerda) and j < len(direita):
+        if esquerda[i] <= direita[j]:
+            merged.append(esquerda[i])
+            i += 1
+        else:
+            merged.append(direita[j])
+            j += 1
+            # Todos os elementos restantes da esquerda são maiores -> inversões
+            inversoes += len(esquerda) - i
+
+    merged.extend(esquerda[i:])
+    merged.extend(direita[j:])
+
+    return merged, inversoes
+
+
 def calc_ultrapassagens(local_jogadores):
-    ultrapassagens = 0
-    n  = len(local_jogadores)
+    # Ordena por posição inicial
+    local_jogadores.sort(key=lambda x: x[0])
 
-    for i in range(n):
-        for j in range(i+1, n):
-            pos_inicial_i, pos_final_i = local_jogadores[i]
-            pos_inicial_j, pos_final_j = local_jogadores[j]
+    # Extrai a sequência das posições finais
+    finais = [fim for _, fim in local_jogadores]
 
-            # Verifica se houve ultrapassagem
-            if (pos_inicial_i > pos_inicial_j  and  pos_final_i < pos_final_j) \
-            or (pos_inicial_i < pos_inicial_j  and  pos_final_i > pos_final_j):
-                ultrapassagens += 1
-
+    # Conta inversões na lista de posições finais
+    _, ultrapassagens = merge_count(finais)
     return ultrapassagens
+
 
 # Número de trechos
 n_trechos = int(input())
