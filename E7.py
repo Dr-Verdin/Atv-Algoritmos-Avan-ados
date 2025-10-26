@@ -1,61 +1,64 @@
-def prox_batida(s):
-    """
-        Retorna o indice da proxima batida.
-    """
-    if len(s) > 2:
-        menor = min(s[1:-1], key=lambda t: t[0])
-        return s.index(menor)+1
-    else:
-        menor = min(s, key=lambda t: t[0])
-        return s.index(menor)
+def process_list(nums):
+    total_subtracoes = 0
 
-def batida(s, idx):
-    """
-        Bate em uma das reliquias e faz as alterações necessárias nas colunas.
-    """
-    # Decremento do número do indice
-    valor, tipo = s[idx]
-    if valor - 1 < 0:
-        return KeyError
-    s[idx] = (valor-1, tipo)
+    # Função para encontrar o menor número em uma coluna específica,
+    # priorizando os elementos do meio quando houver repetidos
+    def encontrar_menor_em_coluna(col):
+        if not col:
+            return None
+        menores = [i for i, x in enumerate(col) if x > 0 and x == min([v for v in col if v > 0])]
+        for i in menores:
+            if i != 0 and i != len(col) - 1:
+                return i
+        return menores[0] if menores else None
 
-    # Cria uma nova coluna
-    if valor - 1 == 0:
-        # Caso 1: deleta o topo elemento
-        if tipo == "topo" and len(s) > idx + 1:
-            valor, tipo = s[idx+1]
-            s[idx+1] = valor-1, "topo"
-        # Caso 2: deleta a base elemento
-        elif tipo == "base" and len(s) > idx:
-            valor, tipo = s[idx-1]
-            s[idx-1] = valor, "base"
-        # Caso 3: deleta um elemento do meio -> não precisa fazer nada
-        # Caso 4: deleta o ultimo elemento -> só deleta
-        del s[idx]
-    else:
-        # Caso 1: subtrai o topo do elemento
-        if tipo == "topo" and len(s) > idx + 1:
-            valor, tipo = s[idx+1]
-            s[idx+1] = valor-1, "topo"
-        # Caso 2: subtrai a base elemento
-        elif tipo == "base" and len(s) > idx:
-            valor, tipo = s[idx-1]
-            s[idx-1] = valor, "base"
-        # Caso 3: subtrai um elemento do meio -> só subtrair
-        # Caso 4: subtrai o ultimo elemento  -> só subtrair
+    colunas = [nums]  # lista inicial de colunas
 
-def calc_n_batidas(s):
-    n_batidas = 0
-    while len(s) != 0:
-        idx = prox_batida(s)
+    while colunas:
+        # 1. Encontrar o menor T entre todas as colunas
+        menor_valor = float('inf')
+        pos_col = None
+        pos_idx = None
 
-        # Batida (Cascata)
-        batida(s, idx)
-        n_batidas += 1
+        for c_idx, col in enumerate(colunas):
+            if not col:
+                continue
+            idx = encontrar_menor_em_coluna(col)
+            if idx is not None and col[idx] < menor_valor:
+                menor_valor = col[idx]
+                pos_col = c_idx
+                pos_idx = idx
 
-    return n_batidas
+        if pos_col is None:  # todas as colunas estão vazias ou sem valores positivos
+            break
 
-n_reliquias = int(input())
-reliquias = list(map(int, input().split()))
+        # 2. Subtrair 1 do T
+        total_subtracoes += 1
+        colunas[pos_col][pos_idx] -= 1
 
-print(calc_n_batidas(n_reliquias))
+        # 3. Subtrair índice+1 do próximo elemento à direita, se existir
+        if pos_idx + 1 < len(colunas[pos_col]):
+            colunas[pos_col][pos_idx + 1] -= (pos_idx + 1)
+            if colunas[pos_col][pos_idx + 1] < 0:
+                colunas[pos_col][pos_idx + 1] = 0
+
+        # 4. Se T chegou a zero, dividir a coluna
+        if colunas[pos_col][pos_idx] == 0:
+            direita = colunas[pos_col][pos_idx + 1:] if pos_idx + 1 < len(colunas[pos_col]) else []
+            colunas[pos_col] = colunas[pos_col][:pos_idx]
+            if direita:
+                colunas.insert(pos_col + 1, direita)
+
+        # 5. Remover colunas vazias
+        colunas = [col for col in colunas if col]
+
+        # 6. Imprimir o estado atual das colunas
+        print(' | '.join(str(col) for col in colunas))
+
+    print("Total de subtrações:", total_subtracoes)
+
+
+# Exemplo de uso
+N = int(input("N: "))
+nums = list(map(int, input("Lista: ").split()))
+process_list(nums)
