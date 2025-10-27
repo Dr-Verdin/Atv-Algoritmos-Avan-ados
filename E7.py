@@ -1,64 +1,19 @@
-def process_list(nums):
-    total_subtracoes = 0
+# Leitura da entrada
+n_reliquias = int(input())
+reliquias = list(map(int, input().split()))
 
-    # Função para encontrar o menor número em uma coluna específica,
-    # priorizando os elementos do meio quando houver repetidos
-    def encontrar_menor_em_coluna(col):
-        if not col:
-            return None
-        menores = [i for i, x in enumerate(col) if x > 0 and x == min([v for v in col if v > 0])]
-        for i in menores:
-            if i != 0 and i != len(col) - 1:
-                return i
-        return menores[0] if menores else None
+# Tabela
+# A DP precisa guardar o menor custo para cada escolha, porque a escolha de um elemento afeta a próxima escolha
+# i: indica até qual elemento de reliquias estamos considerando
+# j: indica o estado do elemento atual (0 ou 1)
+dp = [[0, 0] for _ in range(n_reliquias+1)]
 
-    colunas = [nums]  # lista inicial de colunas
+# Inicialização
+dp[0][0] = 0
+dp[0][1] = 1
 
-    while colunas:
-        # 1. Encontrar o menor T entre todas as colunas
-        menor_valor = float('inf')
-        pos_col = None
-        pos_idx = None
+for i in range(n_reliquias):
+    dp[i+1][0] = min(dp[i][0], dp[i][1]) + reliquias[i]
+    dp[i+1][1] = min(dp[i][1] + (reliquias[i] - 1), dp[i][0] + max(reliquias[i] - i, 0))
 
-        for c_idx, col in enumerate(colunas):
-            if not col:
-                continue
-            idx = encontrar_menor_em_coluna(col)
-            if idx is not None and col[idx] < menor_valor:
-                menor_valor = col[idx]
-                pos_col = c_idx
-                pos_idx = idx
-
-        if pos_col is None:  # todas as colunas estão vazias ou sem valores positivos
-            break
-
-        # 2. Subtrair 1 do T
-        total_subtracoes += 1
-        colunas[pos_col][pos_idx] -= 1
-
-        # 3. Subtrair índice+1 do próximo elemento à direita, se existir
-        if pos_idx + 1 < len(colunas[pos_col]):
-            colunas[pos_col][pos_idx + 1] -= (pos_idx + 1)
-            if colunas[pos_col][pos_idx + 1] < 0:
-                colunas[pos_col][pos_idx + 1] = 0
-
-        # 4. Se T chegou a zero, dividir a coluna
-        if colunas[pos_col][pos_idx] == 0:
-            direita = colunas[pos_col][pos_idx + 1:] if pos_idx + 1 < len(colunas[pos_col]) else []
-            colunas[pos_col] = colunas[pos_col][:pos_idx]
-            if direita:
-                colunas.insert(pos_col + 1, direita)
-
-        # 5. Remover colunas vazias
-        colunas = [col for col in colunas if col]
-
-        # 6. Imprimir o estado atual das colunas
-        print(' | '.join(str(col) for col in colunas))
-
-    print("Total de subtrações:", total_subtracoes)
-
-
-# Exemplo de uso
-N = int(input("N: "))
-nums = list(map(int, input("Lista: ").split()))
-process_list(nums)
+print(min(dp[n_reliquias][0], dp[n_reliquias][1]))
