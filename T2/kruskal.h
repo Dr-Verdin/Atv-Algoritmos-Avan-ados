@@ -8,44 +8,50 @@
 
 #include "types.h"
 
-class UnionFind{
+// Estrutura Union-Find (Disjoint Set Union) usada pelo algoritmo de Kruskal
+class UnionFind {
 private:
-    std::map<std::string, std::string> parent;     // cada vértice (sistema) terá um "pai" na estrutura de conjuntos
+    std::map<std::string, std::string> parent; // armazena o "pai" de cada vértice
 public:
-    void makeSet(const std::vector<Coordenada>& elementos){
-        for(const auto& e : elementos) parent[e.name] = e.name;
+    // Inicializa cada vértice como seu próprio conjunto
+    void makeSet(const std::vector<Coordenada>& elementos) {
+        for (const auto& e : elementos)
+            parent[e.name] = e.name;
     }
 
-    // Encontra o representante do conjunto do vértice x
-    std::string find(const std::string& x){
-        if(parent[x] == x) return x;
+    // Retorna o representante do conjunto (com compressão de caminho)
+    std::string find(const std::string& x) {
+        if (parent[x] == x) return x;
         return parent[x] = find(parent[x]);
     }
 
-    // Une os conjuntos de x e y
-    bool unite(const std::string& a, const std::string& b){
+    // Une os conjuntos de dois vértices; retorna false se já estavam unidos
+    bool unite(const std::string& a, const std::string& b) {
         std::string pa = find(a);
         std::string pb = find(b);
-        if(pa == pb) return false;
-        parent[pb] = pa;    // une os conjuntos de u e v
+        if (pa == pb) return false;  // já pertencem ao mesmo conjunto
+        parent[pb] = pa;             // une pb ao conjunto de pa
         return true;
     }
 };
 
-inline std::vector<Aresta> kruskal(const std::vector<Coordenada>& vertices, const std::vector<Aresta>& arestas){
-    std::vector<Aresta> mst; // Para armazenar as arestas da MST
+// Algoritmo de Kruskal: gera a Árvore Geradora Mínima (MST)
+inline std::vector<Aresta> kruskal(const std::vector<Coordenada>& vertices, const std::vector<Aresta>& arestas) {
+    std::vector<Aresta> mst; // armazena as arestas da MST
 
     UnionFind uf;
-    uf.makeSet(vertices);   // parent[vertice] = vertice
+    uf.makeSet(vertices);    // cada vértice começa em seu próprio conjunto
 
     std::vector<Aresta> sorted = arestas;
-    std::sort(sorted.begin(), sorted.end());   // ordenar as arestas pelo peso crescente
+    std::sort(sorted.begin(), sorted.end());  // ordena as arestas por peso
 
-    for(const auto& a : sorted){
-        if(uf.unite(a.u, a.v)){     // u e v não estão no mesmo conjunto
+    // adiciona arestas que conectam conjuntos diferentes
+    for (const auto& a : sorted) {
+        if (uf.unite(a.u, a.v)) {
             mst.push_back(a);
         }
     }
+
     return mst;
 }
 

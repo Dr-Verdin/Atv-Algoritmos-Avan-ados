@@ -3,7 +3,6 @@
 #include <string>
 #include <iomanip>
 #include <algorithm>
-#include <unordered_map>
 
 #include "types.h"
 #include "utils.h"
@@ -14,7 +13,7 @@ using namespace std;
 
 int main(){
     int nCasos;
-    cin >> nCasos;
+    cin >> nCasos; // lê o número de casos de teste
 
     for(int n = 0; n < nCasos; n++){
         int nSistemas, nSistemasImportantes;
@@ -23,43 +22,44 @@ int main(){
 
         vector<Coordenada> sistemas;
         vector<Coordenada> importantes;
-        unordered_map<std::string, size_t> nameToIndex;
 
+        // lê os sistemas e separa os importantes
         for(int i = 0; i < nSistemas; i++){
             string nome;
             float x, y;
             cin >> nome >> x >> y;
-            sistemas.push_back({x, y, nome});
-            nameToIndex[nome] = sistemas.size() - 1;
-            if(i < nSistemasImportantes) importantes.push_back({x, y, nome});
+
+            sistemas.push_back({x, y, nome, i});
+            if(i < nSistemasImportantes) importantes.push_back({x, y, nome, i});
         }
 
-        // 1. A Malha de Túneis Essencial (Algoritmo Guloso)
-        vector<Aresta> arestasImportantes = gerarArestas(importantes, maxTensao);
-        vector<Aresta> malha = kruskal(importantes, arestasImportantes);
+        // --- 1. Malha de Túneis Essencial (Kruskal) ---
+        vector<Aresta> arestasImportantes = gerarArestas(importantes, maxTensao); // gera arestas entre sistemas importantes
+        vector<Aresta> malha = kruskal(importantes, arestasImportantes);          // aplica o algoritmo de Kruskal
+        ordenarArestas(malha);                                                    // ordena as arestas para exibição
 
+        // imprime a malha final
         for(const auto& a : malha){
-            cout << a.u << ", " << a.v << ", " << fixed << setprecision(2) << a.peso << endl;
+            // garante que o menor índice venha primeiro na saída
+            if(a.idx_v < a.idx_u){
+                cout << a.v << ", " << a.u << ", " << fixed << setprecision(2) << a.peso << endl;
+            } else {
+                cout << a.u << ", " << a.v << ", " << fixed << setprecision(2) << a.peso << endl;
+            }
         }
 
-        // 2. O Ponto de Ressonância Gravitacional (Algoritmo de Divisão e Conquista)
-        Aresta zonaAlerta = closestPair(sistemas);
+        // --- 2. Ponto de Ressonância Gravitacional (Divisão e Conquista) ---
+        Aresta zonaAlerta = closestPair(sistemas); // encontra o par de sistemas mais próximos
 
-        auto itU = nameToIndex.find(zonaAlerta.u);
-        auto itV = nameToIndex.find(zonaAlerta.v);
+        // garante a ordem correta dos nomes ao exibir
+        if(zonaAlerta.idx_v < zonaAlerta.idx_u){
+            swap(zonaAlerta.u, zonaAlerta.v);
+            swap(zonaAlerta.idx_u, zonaAlerta.idx_v);
+        }
 
-        std::string primeiro = zonaAlerta.u;
-        std::string segundo  = zonaAlerta.v;
-
-        // Se ambos encontrados, ordena por índice
-        if (itU != nameToIndex.end() && itV != nameToIndex.end()) {
-            if (itV->second < itU->second) {
-                zonaAlerta.v = primeiro;
-                zonaAlerta.u = segundo;
-            }
-        }   
-
-        cout << "Ponto de Ressonância: " << zonaAlerta.u << ", " << zonaAlerta.v << ", " << fixed << setprecision(2) << zonaAlerta.peso << endl;
+        cout << "Ponto de Ressonância: " 
+             << zonaAlerta.u << ", " << zonaAlerta.v << ", " 
+             << fixed << setprecision(2) << zonaAlerta.peso << endl;
         cout << endl;
     }
 
