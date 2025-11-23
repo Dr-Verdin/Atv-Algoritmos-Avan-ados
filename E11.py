@@ -1,5 +1,4 @@
 # Implementar DSU
-import sys
 
 def union(pai, tamanho, u, v):
     """
