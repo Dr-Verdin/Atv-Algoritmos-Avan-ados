@@ -59,7 +59,7 @@ for _ in range(n_casos):
         print("O vale nao pode ser completamente atravessado.\n")
         continue
 
-    print(f"custo minimo: {custo}")
+    print(f"Custo minimo: {custo}")
     print(f"Pontes reconstruídas:")
     for u, v, c in mst:
         if u > v:
