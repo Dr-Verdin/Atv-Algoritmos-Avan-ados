@@ -60,7 +60,7 @@ for _ in range(n_casos):
         continue
 
     print(f"Custo minimo: {custo}")
-    print(f"Pontes reconstruídas:")
+    print(f"Pontes reconstruidas:")
     for u, v, c in mst:
         if u > v:
             u, v = v, u
